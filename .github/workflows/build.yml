@@ -46,10 +46,9 @@ jobs:
         run: docker load -i ${DOCKER_CACHE_PATH}
         env:
           DOCKER_CACHE_PATH: docker_cache.tar
-          
+
   build:
     runs-on: ubuntu-latest
-    if: github.ref_type != 'tag'  # Hanya jalankan jika bukan tag
     needs: [docker]  # Tunggu job docker selesai
     steps:
       - uses: actions/checkout@v4
@@ -61,8 +60,8 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version-file: .node-version  # Gunakan versi Node.js dari file .node-version
-          cache: 'yarn'  # Cache dependensi yarn
+          node-version-file: .node-version
+          cache: 'yarn'
 
       - name: Debug cache
         run: |
