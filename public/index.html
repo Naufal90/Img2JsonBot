@@ -5,6 +5,27 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Upload Gambar</title>
 </head>
+  <style>
+  .progress-container {
+    width: 300px;
+    background-color: #f3f3f3;
+    border-radius: 5px;
+    margin-top: 20px;
+  }
+  .progress-bar {
+    width: 0%;
+    height: 20px;
+    background-color: #4CAF50;
+    border-radius: 5px;
+    text-align: center;
+    line-height: 20px;
+    color: white;
+  }
+  #result {
+    margin-top: 20px;
+    font-size: 1.2em;
+  }
+  </style>
 <body>
   <h1>Upload Gambar</h1>
   <form id="uploadForm">
@@ -13,35 +34,65 @@
   </form>
   <div id="result"></div>
 
+  <div class="progress-container">
+  <div id="progressBar" class="progress-bar">0%</div>
+</div>
+<div id="result"></div>
+
   <script>
     document.getElementById('uploadForm').onsubmit = function (e) {
-      e.preventDefault();
+    e.preventDefault();
 
-      const formData = new FormData();
-      formData.append('image', document.getElementById('image').files[0]);
+    const file = document.getElementById('image').files[0];
+    const formData = new FormData();
+    formData.append('image', file);
 
-      fetch('/generate', {
-        method: 'POST',  // Pastikan menggunakan POST
-        body: formData,
-      })
-        .then(response => {
-          if (!response.ok) {
-            throw new Error(`Gagal mengunggah file. Status: ${response.status}`);
-          }
-          return response.blob();
-        })
-        .then(blob => {
-          const link = document.createElement('a');
-          link.href = URL.createObjectURL(blob);
-          link.download = 'structure.json';
-          link.click();
-          document.getElementById('result').innerHTML = "File berhasil diunduh!";
-        })
-        .catch(error => {
-          console.error('Terjadi kesalahan:', error.message);
-          document.getElementById('result').innerHTML = "Terjadi kesalahan saat memproses file.";
-        });
+    const progressBar = document.getElementById('progressBar');
+    const resultDiv = document.getElementById('result');
+
+    // Reset progress bar
+    progressBar.style.width = '0%';
+    progressBar.innerText = '0%';
+    resultDiv.innerHTML = '';
+
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', '/generate', true);
+
+    // Progress event
+    xhr.upload.onprogress = function (event) {
+      if (event.lengthComputable) {
+        const percent = (event.loaded / event.total) * 100;
+        progressBar.style.width = `${percent}%`;
+        progressBar.innerText = `${Math.round(percent)}%`;
+      }
     };
+
+    xhr.onload = function () {
+      if (xhr.status === 200) {
+        // Update progress bar ke 100%
+        progressBar.style.width = '100%';
+        progressBar.innerText = '100%';
+
+        // Unduh file
+        const blob = new Blob([xhr.response], { type: 'application/json' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'structure.json';
+        link.click();
+        resultDiv.innerHTML = "File berhasil diunduh!";
+      } else {
+        console.error('Terjadi kesalahan:', xhr.statusText);
+        resultDiv.innerHTML = "Terjadi kesalahan saat memproses file.";
+      }
+    };
+
+    xhr.onerror = function () {
+      console.error('Terjadi kesalahan:', xhr.statusText);
+      resultDiv.innerHTML = "Terjadi kesalahan saat memproses file.";
+    };
+
+    xhr.send(formData);
+  };
   </script>
 </body>
 </html>
