@@ -76,8 +76,8 @@ jobs:
       - name: Install dependencies
         run: yarn install
 
-      - name: Build project
-        run: yarn build  # Jalankan script build dari package.json
+      #- name: Build project
+        #run: yarn build  # Jalankan script build dari package.json
 
   deploy:
     runs-on: ubuntu-latest
