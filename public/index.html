@@ -1,15 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image to Minecraft Structure</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upload Gambar</title>
 </head>
 <body>
-    <h1>Upload Gambar</h1>
-    <form action="/generate" method="POST" enctype="multipart/form-data">
-        <input type="file" name="image" accept="image/*" required>
-        <button type="submit">Generate Structure</button>
-    </form>
+  <h1>Upload Gambar</h1>
+  <form id="uploadForm">
+    <input type="file" name="image" id="image" required>
+    <button type="submit">Kirim Gambar</button>
+  </form>
+  <div id="result"></div>
+
+  <script>
+    document.getElementById('uploadForm').onsubmit = function (e) {
+      e.preventDefault();
+
+      const formData = new FormData();
+      formData.append('image', document.getElementById('image').files[0]);
+
+      fetch('/generate', {
+        method: 'POST',  // Pastikan menggunakan POST
+        body: formData,
+      })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`Gagal mengunggah file. Status: ${response.status}`);
+          }
+          return response.blob();
+        })
+        .then(blob => {
+          const link = document.createElement('a');
+          link.href = URL.createObjectURL(blob);
+          link.download = 'structure.json';
+          link.click();
+          document.getElementById('result').innerHTML = "File berhasil diunduh!";
+        })
+        .catch(error => {
+          console.error('Terjadi kesalahan:', error.message);
+          document.getElementById('result').innerHTML = "Terjadi kesalahan saat memproses file.";
+        });
+    };
+  </script>
 </body>
 </html>
