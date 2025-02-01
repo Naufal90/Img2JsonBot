@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -26,27 +26,17 @@ jobs:
       - name: Install dependencies
         run: npm install -g yarn@latest
 
-      - name: Create Docker cache file
-        run: |
-          # Perintah Anda untuk membuat atau mengunduh docker_cache.tar
-          echo "Creating docker_cache.tar"
-          touch docker_cache.tar  # Ganti ini dengan perintah yang sebenarnya
+      - name: Cache Docker image
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.DOCKER_CACHE_PATH }}
+          key: ${{ runner.os }}-docker-${{ github.sha }}
 
-      - name: Check Docker cache file
-        run: |
-          if [ -f "${DOCKER_CACHE_PATH}" ]; then
-            echo "Cache file exists."
-          else
-            echo "Cache file does not exist."
-            exit 1  # Keluar dengan status error jika file tidak ada
-          fi
-        env:
-          DOCKER_CACHE_PATH: docker_cache.tar
+      - name: Build Docker image
+        run: docker build -t minecraft-structure-image:latest .
 
-      - name: Load Docker cache
-        run: docker load -i ${DOCKER_CACHE_PATH}
-        env:
-          DOCKER_CACHE_PATH: docker_cache.tar
+      - name: Save Docker image
+        run: docker save -o ${DOCKER_CACHE_PATH} minecraft-structure-image:latest
 
   build:
     runs-on: ubuntu-latest
@@ -64,6 +54,12 @@ jobs:
           node-version-file: .node-version
           cache: 'yarn'
 
+      - name: Restore Docker cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.DOCKER_CACHE_PATH }}
+          key: ${{ runner.os }}-docker-${{ github.sha }}
+
       - name: Debug cache
         run: |
           ls -la
@@ -71,7 +67,7 @@ jobs:
             echo "Cache file exists."
           else
             echo "Cache file does not exist."
-            exit 1  # Keluar dengan status error jika file tidak ada
+            exit 1
           fi
 
       - name: Restore Docker image
@@ -107,6 +103,12 @@ jobs:
           node-version-file: .node-version
           cache: 'yarn'
 
+      - name: Restore Docker cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.DOCKER_CACHE_PATH }}
+          key: ${{ runner.os }}-docker-${{ github.sha }}
+
       - name: Debug cache
         run: |
           ls -la
@@ -114,7 +116,7 @@ jobs:
             echo "Cache file exists."
           else
             echo "Cache file does not exist."
-            exit 1  # Keluar dengan status error jika file tidak ada
+            exit 1
           fi
 
       - name: Restore Docker image
