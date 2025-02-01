@@ -47,10 +47,13 @@ jobs:
         with:
           submodules: recursive  # Jika menggunakan submodule
 
+      - name: Upgrade Yarn
+        run: npm install -g yarn@latest
+
       - uses: actions/setup-node@v4
         with:
           node-version-file: .node-version  # Gunakan versi Node.js dari file .node-version
-          cache: yarn  # Cache dependensi yarn
+          cache: 'yarn'  # Cache dependensi yarn
 
       - name: Debug cache
         run: |
@@ -86,10 +89,13 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Upgrade Yarn
+        run: npm install -g yarn@latest
+
       - uses: actions/setup-node@v4
         with:
           node-version-file: .node-version
-          cache: yarn
+          cache: 'yarn'
 
       - name: Debug cache
         run: |
