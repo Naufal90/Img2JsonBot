@@ -1,0 +1,89 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+'  # Trigger pada tag versi (misalnya, v1.0.0)
+
+env:
+  DOCKER_CACHE_PATH: docker_cache.tar  # Path untuk cache Docker image
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4  # Checkout kode dari repository
+
+      - name: Cache Docker image
+        uses: actions/cache@v4
+        id: cache-docker-image
+        with:
+          path: ${{ env.DOCKER_CACHE_PATH }}
+          key: ${{ hashFiles('Dockerfile') }}  # Cache berdasarkan perubahan di Dockerfile
+
+      - name: Build Docker image
+        if: steps.cache-docker-image.outputs.cache-hit != 'true'
+        run: |
+          docker build -t my-convert-image:latest .
+          docker save my-convert-image:latest -o ${DOCKER_CACHE_PATH}
+
+  build:
+    runs-on: ubuntu-latest
+    if: github.ref_type != 'tag'  # Hanya jalankan jika bukan tag
+    needs: [docker]  # Tunggu job docker selesai
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive  # Jika menggunakan submodule
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version  # Gunakan versi Node.js dari file .node-version
+          cache: yarn  # Cache dependensi yarn
+
+      - name: Restore Docker image
+        run: docker load -i ${DOCKER_CACHE_PATH}
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Build project
+        run: yarn build  # Jalankan script build dari package.json
+
+  deploy:
+    runs-on: ubuntu-latest
+    if: github.ref_type == 'tag'  # Hanya jalankan jika ada tag
+    needs: [docker]  # Tunggu job docker selesai
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: yarn
+
+      - name: Restore Docker image
+        run: docker load -i ${DOCKER_CACHE_PATH}
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Build project
+        run: yarn build  # Jalankan script build dari package.json
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: './dist'  # Ganti dengan folder output build Anda (misalnya, dist, public, dll)
+
+      - uses: actions/deploy-pages@v4
