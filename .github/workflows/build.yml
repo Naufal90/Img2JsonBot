@@ -38,6 +38,7 @@ jobs:
             echo "Cache file exists."
           else
             echo "Cache file does not exist."
+            exit 1  # Keluar dengan status error jika file tidak ada
           fi
         env:
           DOCKER_CACHE_PATH: docker_cache.tar
@@ -70,6 +71,7 @@ jobs:
             echo "Cache file exists."
           else
             echo "Cache file does not exist."
+            exit 1  # Keluar dengan status error jika file tidak ada
           fi
 
       - name: Restore Docker image
@@ -112,6 +114,7 @@ jobs:
             echo "Cache file exists."
           else
             echo "Cache file does not exist."
+            exit 1  # Keluar dengan status error jika file tidak ada
           fi
 
       - name: Restore Docker image
