@@ -29,6 +29,15 @@ jobs:
           docker build -t minecraft-structure-image:latest .
           docker save minecraft-structure-image:latest -o ${DOCKER_CACHE_PATH}
 
+      - name: Debug cache
+        run: |
+          ls -la
+          if [ -f "${DOCKER_CACHE_PATH}" ]; then
+            echo "Cache file exists."
+          else
+            echo "Cache file does not exist."
+          fi
+
   build:
     runs-on: ubuntu-latest
     if: github.ref_type != 'tag'  # Hanya jalankan jika bukan tag
@@ -42,6 +51,15 @@ jobs:
         with:
           node-version-file: .node-version  # Gunakan versi Node.js dari file .node-version
           cache: yarn  # Cache dependensi yarn
+
+      - name: Debug cache
+        run: |
+          ls -la
+          if [ -f "${DOCKER_CACHE_PATH}" ]; then
+            echo "Cache file exists."
+          else
+            echo "Cache file does not exist."
+          fi
 
       - name: Restore Docker image
         run: docker load -i ${DOCKER_CACHE_PATH}
@@ -72,6 +90,15 @@ jobs:
         with:
           node-version-file: .node-version
           cache: yarn
+
+      - name: Debug cache
+        run: |
+          ls -la
+          if [ -f "${DOCKER_CACHE_PATH}" ]; then
+            echo "Cache file exists."
+          else
+            echo "Cache file does not exist."
+          fi
 
       - name: Restore Docker image
         run: docker load -i ${DOCKER_CACHE_PATH}
