@@ -6,7 +6,6 @@
   "license": "MIT",
   "scripts": {
     "start": "node src/app.js",
-    "build": "webpack --mode production",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
@@ -14,9 +13,5 @@
     "multer": "^1.4.5-lts.1",
     "jimp": "^0.22.7",
     "jsonfile": "^6.1.0"
-  },
-  "devDependencies": {
-    "webpack": "^5.75.0",
-    "webpack-cli": "^5.0.1"
-  }
+    }
 }
