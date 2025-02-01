@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Aplikasi untuk mengonversi gambar menjadi struktur Minecraft",
   "main": "src/app.js",
-  "license": "MIT",  <-- Tambahkan field license
+  "license": "MIT",
   "scripts": {
     "start": "node src/app.js",
     "build": "webpack --mode production",
