@@ -1,9 +1,9 @@
-name: Build and Deploy
+name: Build and Deploy Minecraft Structure Generator
 
 on:
   push:
     branches:
-      - main
+      - main  # Trigger pada push ke branch main
     tags:
       - '[0-9]+.[0-9]+.[0-9]+'  # Trigger pada tag versi (misalnya, v1.0.0)
 
@@ -26,8 +26,8 @@ jobs:
       - name: Build Docker image
         if: steps.cache-docker-image.outputs.cache-hit != 'true'
         run: |
-          docker build -t my-convert-image:latest .
-          docker save my-convert-image:latest -o ${DOCKER_CACHE_PATH}
+          docker build -t minecraft-structure-image:latest .
+          docker save minecraft-structure-image:latest -o ${DOCKER_CACHE_PATH}
 
   build:
     runs-on: ubuntu-latest
@@ -84,6 +84,6 @@ jobs:
 
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: './dist'  # Ganti dengan folder output build Anda (misalnya, dist, public, dll)
+          path: './public'  # Folder output build (sesuaikan dengan proyek Anda)
 
       - uses: actions/deploy-pages@v4
