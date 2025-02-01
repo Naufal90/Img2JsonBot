@@ -81,7 +81,7 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-    if: github.ref_type == 'tag'  # Hanya jalankan jika ada tag
+    if: always()  # Hanya jalankan jika ada tag
     needs: [docker]  # Tunggu job docker selesai
     permissions:
       contents: read
@@ -125,8 +125,8 @@ jobs:
       - name: Install dependencies
         run: yarn install
 
-      #- name: Build project
-        #run: yarn build  # Jalankan script build dari package.json
+      - name: Build project
+        run: yarn build  # Jalankan script build dari package.json
 
       - uses: actions/upload-pages-artifact@v3
         with:
