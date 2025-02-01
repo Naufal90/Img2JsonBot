@@ -11,33 +11,42 @@ env:
   DOCKER_CACHE_PATH: docker_cache.tar  # Path untuk cache Docker image
 
 jobs:
-  docker:
+  build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4  # Checkout kode dari repository
-
-      - name: Cache Docker image
-        uses: actions/cache@v4
-        id: cache-docker-image
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
-          path: ${{ env.DOCKER_CACHE_PATH }}
-          key: ${{ hashFiles('Dockerfile') }}  # Cache berdasarkan perubahan di Dockerfile
+          node-version-file: .node-version
+          cache: yarn
 
-      - name: Build Docker image
-        if: steps.cache-docker-image.outputs.cache-hit != 'true'
-        run: |
-          docker build -t minecraft-structure-image:latest .
-          docker save minecraft-structure-image:latest -o ${DOCKER_CACHE_PATH}
+      - name: Install dependencies
+        run: npm install -g yarn@latest
 
-      - name: Debug cache
+      - name: Create Docker cache file
         run: |
-          ls -la
+          # Perintah Anda untuk membuat atau mengunduh docker_cache.tar
+          echo "Creating docker_cache.tar"
+          touch docker_cache.tar  # Ganti ini dengan perintah yang sebenarnya
+
+      - name: Check Docker cache file
+        run: |
           if [ -f "${DOCKER_CACHE_PATH}" ]; then
             echo "Cache file exists."
           else
             echo "Cache file does not exist."
           fi
+        env:
+          DOCKER_CACHE_PATH: docker_cache.tar
 
+      - name: Load Docker cache
+        run: docker load -i ${DOCKER_CACHE_PATH}
+        env:
+          DOCKER_CACHE_PATH: docker_cache.tar
+          
   build:
     runs-on: ubuntu-latest
     if: github.ref_type != 'tag'  # Hanya jalankan jika bukan tag
