@@ -2,11 +2,14 @@
 const express = require('express');
 const multer = require('multer');
 const path = require('path');
+const cors = require('cors');
 const fs = require('fs');
 const { generateStructureFromImage } = require('../services/imageService');
 
 const router = express.Router();
 const upload = multer({ dest: 'uploads/' });
+
+app.use(cors());
 
 // Endpoint untuk meng-handle upload gambar dan menghasilkan JSON
 router.post('/generate', upload.single('image'), async (req, res) => {
