@@ -1,10 +1,12 @@
 {
   "name": "minecraft-structure-generator",
   "version": "1.0.0",
+  "description": "Aplikasi untuk mengonversi gambar menjadi struktur Minecraft",
+  "main": "src/app.js",
   "scripts": {
-    "start": "node src/app.js",  # Jalankan server lokal
-    "build": "webpack --mode production",  # Contoh menggunakan webpack
-    "test": "echo 'No tests yet'"
+    "start": "node src/app.js",
+    "build": "webpack --mode production",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
     "express": "^4.18.2",
